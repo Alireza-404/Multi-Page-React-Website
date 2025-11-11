@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth !important;
+  }
+
+  .dark-selection::selection {
+    color: #ea3956;
+  }
+
+  .light-selection::selection {
+    color: slateblue;
+  }
+
+  .light-scroll::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .light-scroll::-webkit-scrollbar-track {
+    background-color: #91939795;
+  }
+
+  .light-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #05070a00, #1b65d38a, #05070a00);
+    border-radius: 10px;
+  }
+
+  .light-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #05070a00, #1b65d3b3, #05070a00);
+  }
+
+  .dark-scroll::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .dark-scroll::-webkit-scrollbar-track {
+    background-color: #05070af8;
+  }
+
+  .dark-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #05070a00, #1184f739, #05070a00);
+    border-radius: 10px;
+  }
+
+  .dark-scroll::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #05070a00, #1184f762, #05070a00);
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  @keyframes CircleChartAnimation {
+    0% {
+      opacity: 0;
+    }
+
+    100% {
+      opacity: 1;
+      transform-origin: 50% 50%;
+    }
+  }
+
+  .circle-chart-animation {
+    animation: 300ms CircleChartAnimation linear both;
+  }
+}
