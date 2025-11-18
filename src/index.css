@@ -48,6 +48,16 @@
   .dark-scroll::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #05070a00, #1184f762, #05070a00);
   }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }
 
 @layer utilities {
@@ -73,5 +83,43 @@
 
   .circle-chart-animation {
     animation: 300ms CircleChartAnimation linear both;
+  }
+
+  .light-scroll-for-month-dropdown::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .light-scroll-for-month-dropdown::-webkit-scrollbar-track {
+    background-color: #91939795;
+    border-radius: 10px;
+  }
+
+  .light-scroll-for-month-dropdown::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #05070a00, #1b65d38a, #05070a00);
+    border-radius: 10px;
+    border-radius: 10px;
+  }
+
+  .light-scroll-for-month-dropdown::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #05070a00, #1b65d3b3, #05070a00);
+  }
+
+  .dark-scroll-for-month-dropdown::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .dark-scroll-for-month-dropdown::-webkit-scrollbar-track {
+    background-color: #05070af8;
+    border-radius: 10px;
+  }
+
+  .dark-scroll-for-month-dropdown::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #05070a00, #1184f739, #05070a00);
+    border-radius: 10px;
+    border-radius: 10px;
+  }
+
+  .dark-scroll-for-month-dropdown::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #05070a00, #1184f762, #05070a00);
   }
 }

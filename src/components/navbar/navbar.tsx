@@ -5,11 +5,19 @@ import { FaMoon, FaSun, FaX } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
 import Overlay from "../overlay/overlay";
 import NavLinks from "../navLinks/navLinks";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../redux/store";
+import { LogoutUser } from "../../redux/slices/authSlice";
+import { FiSettings } from "react-icons/fi";
 
 const Navbar = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
-  const [showNavLinks, setShowNavLinks] = useState<boolean>(false);
   const root = window.document.documentElement;
+
+  const [showNavLinks, setShowNavLinks] = useState<boolean>(false);
+  const [uid, setUid] = useState<null | string>(null);
+  const [isUserLogged, setIsUserLogged] = useState<null | boolean>(null);
 
   useEffect(() => {
     const getLocal = localStorage.getItem("SiteMarkTheme") || "Light";
@@ -18,6 +26,23 @@ const Navbar = () => {
       root.classList.remove("dark");
     } else {
       root.classList.add("dark");
+    }
+
+    const getUid = localStorage.getItem("uid");
+
+    if (getUid) {
+      setUid(getUid);
+    }
+
+    const getIsUserLogged = localStorage.getItem(
+      "LoginInMultiPageReactWebsite"
+    );
+    const parseUserLogged = getIsUserLogged
+      ? JSON.parse(getIsUserLogged)
+      : false;
+
+    if (parseUserLogged) {
+      setIsUserLogged(parseUserLogged);
     }
   }, []);
 
@@ -225,8 +250,8 @@ const Navbar = () => {
                 <button
                   type="button"
                   className="text-sm lg:text-base rounded-md bg-slate-800 h-9 w-full text-gray-200 font-medium hover:bg-slate-700
-              transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-gray-400
-              flex items-center justify-center"
+                  transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-white/75
+                  flex items-center justify-center"
                 >
                   Sign up
                 </button>
@@ -359,27 +384,53 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-x-3 lg:gap-x-4 font-medium select-none">
-          <Link to={"/sign-in"} replace>
-            <button
-              type="button"
-              className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
-             w-20 h-10 hover:bg-gray-300/65 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
-             flex items-center justify-center"
-            >
-              Sign in
-            </button>
-          </Link>
+          {!isUserLogged && !uid ? (
+            <>
+              <Link to={"/sign-in"} replace>
+                <button
+                  type="button"
+                  className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
+                  w-20 h-10 hover:bg-gray-300/65 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
+                  flex items-center justify-center"
+                >
+                  Sign in
+                </button>
+              </Link>
 
-          <Link to={"/sign-up"} replace>
-            <button
-              type="button"
-              className="text-sm lg:text-base rounded-md bg-slate-800 w-20 h-10 text-gray-200 font-medium hover:bg-slate-700
-            transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-gray-300/95
-            flex items-center justify-center"
-            >
-              Sign up
-            </button>
-          </Link>
+              <Link to={"/sign-up"} replace>
+                <button
+                  type="button"
+                  className="text-sm lg:text-base rounded-md bg-slate-800 w-20 h-10 text-gray-200 font-medium hover:bg-slate-700
+                  transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-gray-300/95
+                  flex items-center justify-center"
+                >
+                  Sign up
+                </button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
+                  w-20 h-10 hover:bg-gray-300/65 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
+                  flex items-center justify-center gap-x-2"
+              >
+                Edit
+                <FiSettings className="text-gray-500 dark:text-gray-400 text-sm" />
+              </button>
+
+              <button
+                type="button"
+                className="text-sm lg:text-base rounded-md bg-slate-800 w-20 h-10 text-gray-200 font-medium hover:bg-slate-700
+                  transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-gray-300/95
+                  flex items-center justify-center"
+                onClick={() => dispatch(LogoutUser())}
+              >
+                Logout
+              </button>
+            </>
+          )}
 
           <button
             type="button"

@@ -4,6 +4,7 @@ import type { AppDispatch, RootState } from "../redux/store";
 import { UpdateStringField } from "../redux/slices/fieldsSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import { CompaniesArray, ProductFeaturesArray } from "../data/homePageData";
+import Typewriter from "typewriter-effect";
 import Navbar from "../components/navbar/navbar";
 import Testimonials from "../components/testimonials/testimonials";
 import HighLightItems from "../components/highLightItem/highLightItem";
@@ -62,11 +63,24 @@ const HomePage = () => {
       <header className="pt-[160px] w-11/12 xl:w-full mx-auto">
         <h1
           className="text-slate-800 dark:text-gray-200 text-4xl flex flex-col gap-y-1 items-center font-bold
-          xs:text-[54px] xs:flex-row xs:justify-center xs:gap-x-3 md:text-6xl"
+          xs:text-[54px] xs:flex-row xs:justify-center xs:gap-x-3 md:text-6xl text-center"
           data-aos="fade-down"
         >
-          <span>Our Latest</span>
-          <span className="text-[#027af2]">Products</span>
+          <Typewriter
+            options={{
+              strings: [
+                `<span>Our Latest</span> <span style="color:#027af2">Products</span>`,
+                `<span>Discover</span> <span style="color:#027af2">Innovation</span>`,
+                `<span>Quality You</span> <span style="color:#027af2">Trust</span>`,
+                `<span>Modern.</span> <span style="color:#027af2">Minimal.</span>`,
+                `<span>Powerful</span> <span style="color:#027af2">Design</span>`,
+              ],
+              autoStart: true,
+              loop: true,
+              delay: 80,
+              deleteSpeed: 45,
+            }}
+          />
         </h1>
 
         <p
@@ -123,13 +137,13 @@ const HomePage = () => {
       <main>
         <section className="w-11/12 xl:w-full mt-14 mx-auto xl:max-w-[1280px]">
           <div>
-            <div className="flex items-center justify-center gap-x-1 md:gap-x-2.5 xl:hidden">
+            <div className="items-center justify-center gap-x-1 md:gap-x-2.5 hidden md2:flex xl:hidden">
               <span className="bg-gray-300/50 dark:bg-gray-600/40 block w-32 h-0.5 dark:h-px"></span>
 
               <Link to={"/dashboard"}>
                 <p
                   className="text-slate-800 dark:text-gray-200 font-semibold underline underline-offset-[3px]
-                cursor-pointer text-center mb-4 text-xs md:text-sm lg:text-base"
+                  cursor-pointer text-center mb-4 text-xs md:text-sm lg:text-base"
                 >
                   Go to Dashboard
                 </p>

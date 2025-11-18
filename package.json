@@ -21,7 +21,8 @@
     "react-tsparticles": "^2.9.3",
     "recharts": "^3.3.0",
     "redux": "^5.0.1",
-    "tsparticles": "^2.9.3"
+    "tsparticles": "^2.9.3",
+    "typewriter-effect": "^2.22.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",

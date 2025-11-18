@@ -1,7 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import type { AppDispatch, RootState } from "../redux/store";
-import { UpdateStringField } from "../redux/slices/fieldsSlice";
+import {
+  ClearAllFields,
+  UpdateBooleanField,
+  UpdateStringField,
+} from "../redux/slices/fieldsSlice";
 import {
   FaArrowLeft,
   FaEye,
@@ -10,24 +14,69 @@ import {
   FaLightbulb,
 } from "react-icons/fa6";
 import { FaSmile, FaTachometerAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import {
+  CheckUserInSignin,
+  ClearServerFields,
+  SetFieldsError,
+} from "../redux/slices/authSlice";
+import { motion } from "framer-motion";
 
 const SignIn = () => {
   const field = useSelector((state: RootState) => state.fields);
+  const { check, status, error } = useSelector(
+    (state: RootState) => state.auth
+  );
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const [mounted, setMounted] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [rememberIsTrue, setRememberIsTrue] = useState<boolean>(false);
+  const [isRememberTrue, setIsRememberTrue] = useState<boolean>(false);
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (field.emailForSignIn && field.passwordForSignIn) {
+      try {
+        await dispatch(
+          CheckUserInSignin({
+            email: field.emailForSignIn,
+            password: field.passwordForSignIn,
+          })
+        ).unwrap();
+
+        localStorage.setItem(
+          "LoginInMultiPageReactWebsite",
+          JSON.stringify(true)
+        );
+        navigate("/");
+        dispatch(ClearAllFields());
+      } catch {}
+    } else {
+      dispatch(SetFieldsError());
+    }
+  };
 
   useEffect(() => {
+    dispatch(ClearServerFields());
+
+    const getLocal = localStorage.getItem("LoginInMultiPageReactWebsite");
+    const parseLocal = getLocal ? JSON.parse(getLocal) : false;
+
+    if (parseLocal) {
+      navigate("/");
+    }
+
     AOS.init({ duration: 1000, once: true });
     AOS.refresh();
   }, []);
 
   return (
     <div
-      className="h-screen overflow-y-auto lg:h-screen lg:overflow-hidden bg-gray-100 dark:bg-[#05070a]
+      className="min-h-screen overflow-y-auto bg-gray-100 dark:bg-[#05070a]
      overflow-x-hidden lg:flex lg:items-center lg:justify-center"
     >
       <div
@@ -36,7 +85,11 @@ const SignIn = () => {
       lg:blur-[410px] dark:lg:blur-[500px] lg:bg-blue-500/60"
       ></div>
 
-      <Link to={"/"}>
+      <Link
+        to={"/"}
+        onClick={() => dispatch(ClearAllFields())}
+        className="md:block hidden"
+      >
         <span
           className="text-slate-800 dark:text-gray-200 text-xl relative left-7 top-12 lg:text-2xl lg:left-4
         z-50 lg:cursor-pointer lg:absolute xl:left-9 xl:px-3.5 inline"
@@ -55,6 +108,20 @@ const SignIn = () => {
           flex flex-col gap-y-5 bg-white/80 dark:bg-[#05070aaf] max-w-[525px] lg:max-w-[450px]"
           data-aos={window.innerWidth >= 1024 ? "fade-left" : "fade-right"}
         >
+          <Link
+            to={"/"}
+            onClick={() => dispatch(ClearAllFields())}
+            className="md:hidden block"
+          >
+            <span
+              className="text-slate-800 dark:text-gray-200 text-xl left-2 top-2
+                z-50 inline"
+              data-aos="fade-right"
+            >
+              <FaArrowLeft />
+            </span>
+          </Link>
+
           <svg
             className="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-zzz9b5 lg:hidden"
             focusable="false"
@@ -103,7 +170,7 @@ const SignIn = () => {
             ></path>
           </svg>
 
-          <form className="flex flex-col gap-y-5">
+          <form className="flex flex-col gap-y-5" onSubmit={handleSubmit}>
             <h1 className="text-slate-800 dark:text-gray-200 font-bold text-[33px]">
               Sign in
             </h1>
@@ -118,19 +185,44 @@ const SignIn = () => {
                 </label>
                 <input
                   type="email"
+                  spellCheck={false}
                   autoComplete="email"
                   name="emailForSignIn"
                   id="email-for-sign-in"
                   placeholder="your@email.com"
                   value={field.emailForSignIn}
-                  className="text-slate-800 dark:text-gray-200 font-medium text-sm px-2.5 py-2 rounded-md
-                bg-gray-300/15 dark:bg-[#0b0e14] border border-gray-300/50 dark:border-gray-600/40 outline-none
-                focus:border-gray-400/65 dark:focus:border-gray-500/50 transition-all duration-200"
+                  className={`text-slate-800 dark:text-gray-200 font-medium text-sm px-2.5 py-2 rounded-md
+                bg-gray-300/15 dark:bg-[#0b0e14] border outline-none transition-all duration-200
+                    ${
+                      field.isEmailForSignInTrue
+                        ? "border-[#027af2]"
+                        : `border-gray-300/50 dark:border-gray-600/40 focus:border-gray-400/65
+                    dark:focus:border-gray-500/50`
+                    }`}
                   onChange={(event) => {
                     const value = event.target.value;
                     dispatch(
                       UpdateStringField({ name: "emailForSignIn", value })
                     );
+
+                    const emailRegex =
+                      /^[\w.+-]+[a-zA-Z0-9]+@[\w.]+\.[a-zA-Z]{2,}$/;
+
+                    if (emailRegex.test(value)) {
+                      dispatch(
+                        UpdateBooleanField({
+                          name: "isEmailForSignInTrue",
+                          value: true,
+                        })
+                      );
+                    } else {
+                      dispatch(
+                        UpdateBooleanField({
+                          name: "isEmailForSignInTrue",
+                          value: false,
+                        })
+                      );
+                    }
                   }}
                 />
               </div>
@@ -161,16 +253,39 @@ const SignIn = () => {
                     id="password-for-sign-in"
                     placeholder="........"
                     value={field.passwordForSignIn}
-                    className="text-slate-800 dark:text-gray-200 font-medium text-sm px-2.5 py-2 rounded-md
-                  bg-gray-300/15 dark:bg-[#0b0e14] border border-gray-300/50 dark:border-gray-600/40 outline-none
-                  focus:border-gray-400/65 dark:focus:border-gray-500/50 transition-all duration-200
-                  placeholder:text-2xl w-full"
+                    className={`text-slate-800 dark:text-gray-200 font-medium text-sm px-2.5 py-2 rounded-md
+                  bg-gray-300/15 dark:bg-[#0b0e14] border outline-none transition-all duration-200
+                  placeholder:text-2xl w-full
+                    ${
+                      field.isPasswordForSignInTrue
+                        ? "border-[#027af2]"
+                        : `border-gray-300/50 dark:border-gray-600/40 focus:border-gray-400/65
+                    dark:focus:border-gray-500/50`
+                    }`}
                     maxLength={16}
                     onChange={(event) => {
                       const value = event.target.value;
                       dispatch(
                         UpdateStringField({ name: "passwordForSignIn", value })
                       );
+
+                      const passwordRegex = /^[\w+.!-]{8,16}[a-zA-Z0-9]+$/;
+
+                      if (passwordRegex.test(value)) {
+                        dispatch(
+                          UpdateBooleanField({
+                            name: "isPasswordForSignInTrue",
+                            value: true,
+                          })
+                        );
+                      } else {
+                        dispatch(
+                          UpdateBooleanField({
+                            name: "isPasswordForSignInTrue",
+                            value: false,
+                          })
+                        );
+                      }
                     }}
                   />
 
@@ -199,11 +314,11 @@ const SignIn = () => {
               <div
                 className={`rounded border-2 border-gray-300/50 dark:border-gray-600/40
               h-5 w-5 ${
-                rememberIsTrue
+                isRememberTrue
                   ? "bg-gradient-to-t from-[#4876EE] to-[#2e53b1]"
                   : "bg-gray-300/15 dark:bg-[#0b0e14]"
               }`}
-                onClick={() => setRememberIsTrue((prev) => !prev)}
+                onClick={() => setIsRememberTrue((prev) => !prev)}
               ></div>
 
               <span className="text-slate-800 dark:text-gray-200 font-medium text-sm lg:text-[15px]">
@@ -211,19 +326,75 @@ const SignIn = () => {
               </span>
             </div>
 
-            <button
-              type="submit"
-              className="text-[15px] bg-slate-800 rounded-md hover:bg-slate-700 text-gray-100 font-semibold py-2.5
-              transition duration-200 dark:bg-gray-200 dark:hover:bg-white/75 dark:text-[#05070a]"
-              onClick={(e) => e.preventDefault()}
-            >
-              Sign in
-            </button>
+            <div className="flex flex-col gap-y-2.5">
+              <motion.button
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ duration: 0.3 }}
+                key={status}
+                type="submit"
+                className={`text-sm lg:text-[15px] rounded-md font-medium cursor-pointer h-9 w-full 
+                  flex items-center justify-center gap-x-2.5 transition-all duration-200 relative ${
+                    status === "loading"
+                      ? `bg-slate-500 text-gray-200 dark:bg-gray-500 dark:text-slate-800`
+                      : status === "succeeded"
+                      ? "bg-green-600 dark:bg-green-500 text-white"
+                      : status === "failed"
+                      ? "bg-red-600 dark:bg-red-500 text-white"
+                      : status === "fieldsError"
+                      ? "bg-orange-600 dark:bg-orange-500 text-white"
+                      : `bg-slate-800 text-gray-200 hover:bg-slate-700 dark:bg-gray-200
+                   dark:text-slate-800 dark:hover:bg-white/75`
+                  }`}
+                disabled={status === "succeeded" || status === "loading"}
+              >
+                {status === "loading"
+                  ? "Signing In"
+                  : status === "failed"
+                  ? "Try again"
+                  : status === "succeeded"
+                  ? "Success"
+                  : status === "fieldsError"
+                  ? "Fill in all fields."
+                  : "Sign in"}
+
+                {status === "loading" && (
+                  <span
+                    className="animate-spin w-3 h-3 rounded-full border-2 border-gray-200 dark:border-slate-800
+                      border-t-transparent dark:border-t-transparent"
+                  ></span>
+                )}
+
+                <span
+                  className={`animate-ping w-2 h-2 rounded-full border absolute z-40 top-2 right-2 ${
+                    status === "failed"
+                      ? "bg-red-700 dark:bg-red-600"
+                      : status === "succeeded"
+                      ? "bg-green-700 dark:bg-green-600"
+                      : "hidden"
+                  }`}
+                ></span>
+              </motion.button>
+
+              {error && check && (
+                <p className="text-sm text-red-600 dark:text-red-500 font-semibold text-center">
+                  {error}
+                </p>
+              )}
+            </div>
           </form>
 
           <p className="text-slate-800 dark:text-gray-200 text-sm text-center">
             Don't have an account?{" "}
-            <Link to={"/sign-up"} replace>
+            <Link
+              to={"/sign-up"}
+              replace
+              onClick={() => {
+                dispatch(ClearAllFields());
+
+                setIsRememberTrue(false);
+              }}
+            >
               <span
                 className="text-sm text-slate-800 dark:text-gray-200 font-medium relative after:absolute
                   after:w-full after:-bottom-0.5 after:bg-gray-400/70 dark:after:bg-slate-600 hover:after:w-0

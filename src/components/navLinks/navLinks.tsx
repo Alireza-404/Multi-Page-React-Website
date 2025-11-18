@@ -35,20 +35,20 @@ const NavLinks = ({ href, children, setShowNavLinks }: Props) => {
         </>
       ) : (
         <>
-          <li
-            className="text-slate-800 dark:text-gray-200 font-medium text-sm lg:text-base cursor-pointer
-            hover:bg-gray-300/65 dark:hover:bg-slate-700 transition-all duration-200 rounded px-2 py-1.5 lg:px-2.5
-            xl:px-3 hidden md2:inline"
+          <button
+            type="button"
+            className="text-slate-500 dark:text-gray-500 font-medium text-sm lg:text-base cursor-pointer
+              xl:px-3 hidden md2:inline"
           >
-            {children}
-          </li>
+            <li>{children}</li>
+          </button>
 
-          <li
-            className="text-slate-800 dark:text-gray-200 text-sm font-medium block md2:hidden"
-            onClick={() => setShowNavLinks && setShowNavLinks(false)}
+          <button
+            type="button"
+            className="text-slate-500 dark:text-gray-500 text-sm font-medium block md2:hidden text-start"
           >
-            {children}
-          </li>
+            <li>{children}</li>
+          </button>
         </>
       )}
     </>
