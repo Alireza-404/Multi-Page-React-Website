@@ -40,7 +40,7 @@ const SignUp = () => {
     }
   }, []);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (
@@ -50,14 +50,14 @@ const SignUp = () => {
       field.isConfirmPasswordForSignUpTrue
     ) {
       try {
-        dispatch(
+        await dispatch(
           CheckUserInSignup({
             username: field.userNameForSignUp,
             email: field.emailForSignUp,
           })
         ).unwrap();
 
-        if (status === "succeeded" && !check) {
+        if (!check) {
           setTimeout(() => {
             setShowSecondBoxSignup(true);
           }, 1000);

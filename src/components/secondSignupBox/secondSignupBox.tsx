@@ -42,7 +42,7 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
   const navigate = useNavigate();
 
   const [showMonthDropdown, setShowMonthDropdown] = useState<boolean>(false);
-  const [monthText, setMonthText] = useState<string>("Select Month...");
+  const [monthText, setMonthText] = useState<string | null>("Select Month...");
   const [monthValue, setMonthValue] = useState<string | null>(null);
 
   const [maleChackBox, setMaleCheckBox] = useState<boolean>(false);
