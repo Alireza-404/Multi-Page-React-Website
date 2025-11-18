@@ -32,7 +32,6 @@ const SignIn = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-  const [mounted, setMounted] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isRememberTrue, setIsRememberTrue] = useState<boolean>(false);
 
