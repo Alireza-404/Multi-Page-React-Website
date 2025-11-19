@@ -4,6 +4,8 @@ import type { AppDispatch, RootState } from "../redux/store";
 import { UpdateStringField } from "../redux/slices/fieldsSlice";
 import { AnimatePresence, motion } from "framer-motion";
 import { CompaniesArray, ProductFeaturesArray } from "../data/homePageData";
+import { Link } from "react-router-dom";
+import { FaChevronUp } from "react-icons/fa";
 import Typewriter from "typewriter-effect";
 import Navbar from "../components/navbar/navbar";
 import Testimonials from "../components/testimonials/testimonials";
@@ -13,12 +15,12 @@ import Accordion from "../components/accordion/accordion";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Footer from "../components/footer/footer";
-import { Link } from "react-router-dom";
 
 const HomePage = () => {
   const field = useSelector((state: RootState) => state.fields);
   const dispatch = useDispatch<AppDispatch>();
   const [isDesktop, setIsDesktop] = useState<boolean>(false);
+  const [scrolled, setScrolled] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState(1);
 
   const getAosAnimation = (id: number, aosAnimation: string) => {
@@ -44,6 +46,23 @@ const HomePage = () => {
     window.scrollTo(0, 0);
 
     AOS.init({ duration: 1200, once: true });
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 900);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   useEffect(() => {
@@ -59,6 +78,24 @@ const HomePage = () => {
       ></div>
 
       <Navbar />
+
+      <motion.div
+        animate={{
+          backgroundColor: ["#027af2", "#021aef", "#6502ef", "#027af2"],
+        }}
+        transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+        className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full fixed bottom-7 right-7 z-[9999]
+           transition-all duration-300
+          border-2 border-gray-500 dark:border-gray-400 outline outline-2 outline-gray-400 dark:outline-gray-300
+          -outline-offset-[5px] flex items-center justify-center cursor-pointer ${
+            scrolled
+              ? "opacity-100 visible bottom-0"
+              : "opacity-0 invisible -bottom-12"
+          }`}
+        onClick={() => window.scrollTo(0, 0)}
+      >
+        <FaChevronUp className="text-white sm:text-xl" />
+      </motion.div>
 
       <header className="pt-[160px] w-11/12 xl:w-full mx-auto">
         <h1
@@ -83,15 +120,19 @@ const HomePage = () => {
           />
         </h1>
 
-        <p
-          className="text-gray-500 dark:text-gray-400 text-center text-sm mt-3 xs:mt-6 mx-auto
+        <motion.p
+          animate={{ backgroundPosition: ["0% 200%", "200% 0%"] }}
+          transition={{ duration: 2, ease: "linear", repeat: Infinity }}
+          className="bg-gradient-to-r from-gray-300 via-white to-gray-400
+           bg-clip-text text-transparent text-center text-sm mt-3 xs:mt-6 mx-auto
           xs:w-96 xs:text-base md:text-lg md:w-[450px] lg:w-[700px]"
           data-aos="fade-up"
+          style={{ backgroundSize: "200% 200%" }}
         >
           Explore our cutting-edge dashboard, delivering high-quality solutions
           tailored to your needs. Elevate your experience with top-tier features
           and services.
-        </p>
+        </motion.p>
 
         <div data-aos="fade-right">
           <div className="flex flex-col xs:flex-row xs:gap-x-4 xs:justify-center gap-y-3 mt-7">

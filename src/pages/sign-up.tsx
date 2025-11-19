@@ -11,7 +11,11 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { Link, useNavigate } from "react-router-dom";
 import SecondSignupBox from "../components/secondSignupBox/secondSignupBox";
-import { CheckUserInSignup, SetFieldsError } from "../redux/slices/authSlice";
+import {
+  CheckUserInSignup,
+  ClearServerFields,
+  SetFieldsError,
+} from "../redux/slices/authSlice";
 import { motion } from "framer-motion";
 
 const SignUp = () => {
@@ -32,6 +36,7 @@ const SignUp = () => {
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true });
+    dispatch(ClearServerFields());
 
     const getLocal = localStorage.getItem("uid");
 
@@ -39,6 +44,12 @@ const SignUp = () => {
       navigate("/sign-in");
     }
   }, []);
+
+  useEffect(() => {
+    if (!showSecondBoxSignup) {
+      dispatch(ClearServerFields());
+    }
+  }, [showSecondBoxSignup]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -57,11 +68,9 @@ const SignUp = () => {
           })
         ).unwrap();
 
-        if (!check) {
-          setTimeout(() => {
-            setShowSecondBoxSignup(true);
-          }, 1000);
-        }
+        setTimeout(() => {
+          setShowSecondBoxSignup(true);
+        }, 1000);
       } catch {}
     } else {
       dispatch(SetFieldsError());
@@ -70,7 +79,7 @@ const SignUp = () => {
 
   return (
     <div
-      className="min-h-screen overflow-y-auto bg-gray-100 dark:bg-[#05070a]
+      className="h-screen overflow-y-auto bg-gray-100 dark:bg-[#05070a]
      overflow-x-hidden lg:flex lg:items-center lg:justify-center"
     >
       <div
@@ -292,8 +301,8 @@ const SignUp = () => {
                       placeholder="........"
                       value={field.passwordForSignUp}
                       className={`text-slate-800 dark:text-gray-200 font-medium text-sm px-2.5 py-2 rounded-md
-                  bg-gray-300/15 dark:bg-[#0b0e14] border outline-none transition-all duration-200
-                  placeholder:text-2xl w-full 
+                    bg-gray-300/15 dark:bg-[#0b0e14] border outline-none transition-all duration-200
+                      placeholder:text-2xl w-full 
                      ${
                        field.isPasswordForSignUpTrue
                          ? "border-[#027af2]"
@@ -333,7 +342,7 @@ const SignUp = () => {
                     {!showPassword ? (
                       <span
                         className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-500 dark:text-gray-400
-                    cursor-pointer"
+                        cursor-pointer px-2"
                         onClick={() => setShowPassword(true)}
                       >
                         <FaEye />
@@ -341,7 +350,7 @@ const SignUp = () => {
                     ) : (
                       <span
                         className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-500 dark:text-gray-400
-                    cursor-pointer"
+                        cursor-pointer px-2"
                         onClick={() => setShowPassword(false)}
                       >
                         <FaEyeSlash />
@@ -385,10 +394,11 @@ const SignUp = () => {
                           })
                         );
 
-                        const passwordRegex = /^[\w+.!-]{7,16}[a-zA-Z0-9]+$/;
+                        const confirmPasswordRegex =
+                          /^[\w+.!-]{7,16}[a-zA-Z0-9]+$/;
 
                         if (
-                          passwordRegex.test(value) &&
+                          confirmPasswordRegex.test(value) &&
                           field.passwordForSignUp === value
                         ) {
                           dispatch(
@@ -411,7 +421,7 @@ const SignUp = () => {
                     {!showConfirmPassword ? (
                       <span
                         className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-500 dark:text-gray-400
-                    cursor-pointer"
+                        cursor-pointer px-2"
                         onClick={() => setShowConfirmPassword(true)}
                       >
                         <FaEye />
@@ -419,7 +429,7 @@ const SignUp = () => {
                     ) : (
                       <span
                         className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-500 dark:text-gray-400
-                    cursor-pointer"
+                        cursor-pointer px-2"
                         onClick={() => setShowConfirmPassword(false)}
                       >
                         <FaEyeSlash />
@@ -447,9 +457,8 @@ const SignUp = () => {
 
               <div className="flex flex-col gap-y-2.5">
                 <motion.button
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 0.3 }}
+                  animate={{ scale: [1, -1, 1] }}
+                  transition={{ duration: 0.3, ease: "linear" }}
                   key={status}
                   type="submit"
                   className={`text-sm lg:text-[15px] rounded-md font-medium cursor-pointer h-9 w-full 

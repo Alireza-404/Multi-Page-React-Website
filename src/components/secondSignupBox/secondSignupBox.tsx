@@ -55,7 +55,7 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
   const date = new Date();
   const nowYear = date.getFullYear();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (
@@ -94,7 +94,13 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
         user.gender = "NotSayedGender";
       }
 
-      dispatch(SignupUser(user));
+      try {
+        await dispatch(SignupUser(user)).unwrap();
+
+        setTimeout(() => {
+          navigate("/sign-in");
+        }, 1200);
+      } catch {}
     } else {
       dispatch(SetFieldsError());
     }
@@ -114,16 +120,6 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
   }, []);
 
   useEffect(() => {
-    const getLocal = localStorage.getItem("uid");
-
-    if (status === "succeeded") {
-      if (getLocal) {
-        setTimeout(() => {
-          navigate("/sign-in");
-        }, 1500);
-      }
-    }
-
     if (status === "failed" || status === "idle") {
       dispatch(UpdateStringField({ name: "codeForSignUp", value: "" }));
       dispatch(
@@ -810,9 +806,8 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
             </button>
 
             <motion.button
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.3 }}
+              animate={{ scale: [1, -1, 1] }}
+              transition={{ duration: 0.3, ease: "linear" }}
               key={status}
               type="submit"
               className={`text-sm lg:text-[15px] rounded-md font-medium cursor-pointer h-9 w-full 

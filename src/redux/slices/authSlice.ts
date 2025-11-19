@@ -42,9 +42,6 @@ export const SignupUser = createAsyncThunk<void, User, { rejectValue: string }>(
       if (!res.ok) {
         return thunkAPI.rejectWithValue("Network error. Please try again.");
       }
-
-      const data = await res.json();
-      localStorage.setItem("uid", data.name);
     } catch {
       return thunkAPI.rejectWithValue("Server error. Please try again.");
     }
@@ -89,7 +86,7 @@ export const CheckUserInSignup = createAsyncThunk<
 
 export const CheckUserInSignin = createAsyncThunk<
   void,
-  { email: string; password: string },
+  { email: string; password: string; rememberUser: boolean },
   { rejectValue: string }
 >("Auth/CheckUserInSignin", async (userData, thunkAPI) => {
   try {
@@ -105,16 +102,30 @@ export const CheckUserInSignin = createAsyncThunk<
       return;
     }
 
-    const usersArray = Object.values(users) as User[];
+    const usersArray = Object.entries(users) as [string, User][];
 
     const checkUser = usersArray.find(
-      (user) =>
+      ([id, user]) =>
         user.email === userData.email && user.password === userData.password
     );
 
     if (!checkUser) {
       return thunkAPI.rejectWithValue(
         "The email or password you entered is incorrect. Please check your information and try again."
+      );
+    }
+
+    if (userData.rememberUser) {
+      localStorage.setItem("uid", checkUser[0]);
+      localStorage.setItem(
+        "LoginInMultiPageReactWebsite",
+        JSON.stringify(true)
+      );
+    } else {
+      sessionStorage.setItem("uid", checkUser[0]);
+      sessionStorage.setItem(
+        "SessionLoginInMultiPageReactWebsite",
+        JSON.stringify(true)
       );
     }
   } catch {
@@ -132,7 +143,7 @@ export const GetUser = createAsyncThunk<User, string, { rejectValue: string }>(
         return thunkAPI.rejectWithValue("Network error. Please try again.");
       }
 
-      const user = res.json();
+      const user = await res.json();
       return user;
     } catch {
       return thunkAPI.rejectWithValue("Server error. Please try again.");

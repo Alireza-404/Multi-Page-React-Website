@@ -5,8 +5,8 @@ import { FaMoon, FaSun, FaX } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
 import Overlay from "../overlay/overlay";
 import NavLinks from "../navLinks/navLinks";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "../../redux/store";
 import { LogoutUser } from "../../redux/slices/authSlice";
 import { FiSettings } from "react-icons/fi";
 
@@ -17,9 +17,10 @@ const Navbar = () => {
 
   const [showNavLinks, setShowNavLinks] = useState<boolean>(false);
   const [uid, setUid] = useState<null | string>(null);
-  const [isUserLogged, setIsUserLogged] = useState<null | boolean>(null);
+  const [isUserLogged, setIsUserLogged] = useState<boolean>(false);
 
   useEffect(() => {
+    // Local Storage
     const getLocal = localStorage.getItem("SiteMarkTheme") || "Light";
 
     if (getLocal === "Light") {
@@ -29,20 +30,28 @@ const Navbar = () => {
     }
 
     const getUid = localStorage.getItem("uid");
-
-    if (getUid) {
-      setUid(getUid);
-    }
+    const getUidFromSession = sessionStorage.getItem("uid");
 
     const getIsUserLogged = localStorage.getItem(
       "LoginInMultiPageReactWebsite"
     );
-    const parseUserLogged = getIsUserLogged
-      ? JSON.parse(getIsUserLogged)
-      : false;
+    const getIsUserLoggedFromSession = sessionStorage.getItem(
+      "SessionLoginInMultiPageReactWebsite"
+    );
 
-    if (parseUserLogged) {
-      setIsUserLogged(parseUserLogged);
+    if (getUid && getIsUserLogged && JSON.parse(getIsUserLogged)) {
+      setUid(getUid);
+      setIsUserLogged(JSON.parse(getIsUserLogged));
+    } else if (
+      getUidFromSession &&
+      getIsUserLoggedFromSession &&
+      JSON.parse(getIsUserLoggedFromSession)
+    ) {
+      setUid(getUidFromSession);
+      setIsUserLogged(JSON.parse(getIsUserLoggedFromSession));
+    } else {
+      setUid(null);
+      setIsUserLogged(false);
     }
   }, []);
 
@@ -235,27 +244,59 @@ const Navbar = () => {
             <span className="block h-0.5 w-full bg-gray-300/50 dark:bg-gray-600/40"></span>
 
             <div className="flex flex-col gap-y-2">
-              <Link to={"/sign-in"} replace>
-                <button
-                  type="button"
-                  className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
-                h-9 w-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
-                flex items-center justify-center"
-                >
-                  Sign in
-                </button>
-              </Link>
+              {!uid && !isUserLogged ? (
+                <>
+                  <Link to={"/sign-in"} replace>
+                    <button
+                      type="button"
+                      className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
+                      h-9 w-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
+                      flex items-center justify-center"
+                    >
+                      Sign in
+                    </button>
+                  </Link>
 
-              <Link to={"/sign-up"} replace>
-                <button
-                  type="button"
-                  className="text-sm lg:text-base rounded-md bg-slate-800 h-9 w-full text-gray-200 font-medium hover:bg-slate-700
-                  transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-white/75
-                  flex items-center justify-center"
-                >
-                  Sign up
-                </button>
-              </Link>
+                  <Link to={"/sign-up"} replace>
+                    <button
+                      type="button"
+                      className="text-sm lg:text-base rounded-md bg-slate-800 h-9 w-full text-gray-200 font-medium hover:bg-slate-700
+                      transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-white/75
+                      flex items-center justify-center"
+                    >
+                      Sign up
+                    </button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
+                      h-9 w-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
+                      flex items-center justify-center gap-x-2"
+                  >
+                    Edit
+                    <FiSettings className="text-gray-500 dark:text-gray-400 text-sm" />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="text-sm lg:text-base rounded-md bg-slate-800 h-9 w-full text-gray-200 font-medium hover:bg-slate-700
+                      transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-white/75
+                      flex items-center justify-center"
+                    onClick={() => {
+                      localStorage.removeItem("uid");
+                      localStorage.removeItem("LoginInMultiPageReactWebsite");
+                      dispatch(LogoutUser());
+                      setUid(null);
+                      setIsUserLogged(false);
+                    }}
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
             </div>
           </motion.div>
         )}
@@ -384,7 +425,39 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-x-3 lg:gap-x-4 font-medium select-none">
-          {!isUserLogged && !uid ? (
+          {uid && isUserLogged ? (
+            <>
+              <button
+                type="button"
+                className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
+                  w-20 h-10 hover:bg-gray-300/65 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
+                  flex items-center justify-center gap-x-2"
+              >
+                Edit
+                <FiSettings className="text-gray-500 dark:text-gray-400 text-sm" />
+              </button>
+
+              <button
+                type="button"
+                className="text-sm lg:text-base rounded-md bg-slate-800 w-20 h-10 text-gray-200 font-medium hover:bg-slate-700
+                  transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-gray-300/95
+                  flex items-center justify-center"
+                onClick={() => {
+                  localStorage.removeItem("uid");
+                  localStorage.removeItem("LoginInMultiPageReactWebsite");
+                  sessionStorage.removeItem("uid");
+                  sessionStorage.removeItem(
+                    "SessionLoginInMultiPageReactWebsite"
+                  );
+                  dispatch(LogoutUser());
+                  setUid(null);
+                  setIsUserLogged(false);
+                }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
             <>
               <Link to={"/sign-in"} replace>
                 <button
@@ -407,28 +480,6 @@ const Navbar = () => {
                   Sign up
                 </button>
               </Link>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
-                  w-20 h-10 hover:bg-gray-300/65 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
-                  flex items-center justify-center gap-x-2"
-              >
-                Edit
-                <FiSettings className="text-gray-500 dark:text-gray-400 text-sm" />
-              </button>
-
-              <button
-                type="button"
-                className="text-sm lg:text-base rounded-md bg-slate-800 w-20 h-10 text-gray-200 font-medium hover:bg-slate-700
-                  transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-gray-300/95
-                  flex items-center justify-center"
-                onClick={() => dispatch(LogoutUser())}
-              >
-                Logout
-              </button>
             </>
           )}
 

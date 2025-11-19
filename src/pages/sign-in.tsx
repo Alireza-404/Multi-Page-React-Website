@@ -44,14 +44,14 @@ const SignIn = () => {
           CheckUserInSignin({
             email: field.emailForSignIn,
             password: field.passwordForSignIn,
+            rememberUser: isRememberTrue,
           })
         ).unwrap();
 
-        localStorage.setItem(
-          "LoginInMultiPageReactWebsite",
-          JSON.stringify(true)
-        );
-        navigate("/");
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+
         dispatch(ClearAllFields());
       } catch {}
     } else {
@@ -75,7 +75,7 @@ const SignIn = () => {
 
   return (
     <div
-      className="min-h-screen overflow-y-auto bg-gray-100 dark:bg-[#05070a]
+      className="h-screen overflow-y-auto bg-gray-100 dark:bg-[#05070a]
      overflow-x-hidden lg:flex lg:items-center lg:justify-center"
     >
       <div
@@ -268,7 +268,7 @@ const SignIn = () => {
                         UpdateStringField({ name: "passwordForSignIn", value })
                       );
 
-                      const passwordRegex = /^[\w+.!-]{8,16}[a-zA-Z0-9]+$/;
+                      const passwordRegex = /^[\w+.!-]{7,16}[a-zA-Z0-9]+$/;
 
                       if (passwordRegex.test(value)) {
                         dispatch(
@@ -291,7 +291,7 @@ const SignIn = () => {
                   {!showPassword ? (
                     <span
                       className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-500 dark:text-gray-400
-                    cursor-pointer"
+                      cursor-pointer"
                       onClick={() => setShowPassword(true)}
                     >
                       <FaEye />
@@ -299,7 +299,7 @@ const SignIn = () => {
                   ) : (
                     <span
                       className="absolute top-1/2 -translate-y-1/2 right-3.5 text-gray-500 dark:text-gray-400
-                    cursor-pointer"
+                      cursor-pointer"
                       onClick={() => setShowPassword(false)}
                     >
                       <FaEyeSlash />
@@ -327,9 +327,8 @@ const SignIn = () => {
 
             <div className="flex flex-col gap-y-2.5">
               <motion.button
-                initial={{ scale: 0.9 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.3 }}
+                animate={{ scale: [1, -1, 1] }}
+                transition={{ duration: 0.3, ease: "linear" }}
                 key={status}
                 type="submit"
                 className={`text-sm lg:text-[15px] rounded-md font-medium cursor-pointer h-9 w-full 
