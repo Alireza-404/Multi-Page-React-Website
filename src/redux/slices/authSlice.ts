@@ -105,7 +105,7 @@ export const CheckUserInSignin = createAsyncThunk<
     const usersArray = Object.entries(users) as [string, User][];
 
     const checkUser = usersArray.find(
-      ([id, user]) =>
+      ([_, user]) =>
         user.email === userData.email && user.password === userData.password
     );
 
