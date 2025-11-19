@@ -5,8 +5,8 @@ import { FaMoon, FaSun, FaX } from "react-icons/fa6";
 import { Link, useLocation } from "react-router-dom";
 import Overlay from "../overlay/overlay";
 import NavLinks from "../navLinks/navLinks";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../../redux/store";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../redux/store";
 import { LogoutUser } from "../../redux/slices/authSlice";
 import { FiSettings } from "react-icons/fi";
 
