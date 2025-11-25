@@ -40,6 +40,8 @@ const SignUp = () => {
 
     const getLocal = localStorage.getItem("uid");
 
+    scrollTo(0, 0);
+
     if (getLocal) {
       navigate("/sign-in");
     }

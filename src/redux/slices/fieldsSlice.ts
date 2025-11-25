@@ -17,7 +17,14 @@ type StringFields =
   | "dayForSignUp"
   | "monthForSignUp"
   | "yearForSignUp"
-  | "codeForSignUp";
+  | "codeForSignUp"
+  | "firstNameForEdit"
+  | "lastNameForEdit"
+  | "ageForEdit"
+  | "yearForEdit"
+  | "monthForEdit"
+  | "dayForEdit"
+  | "phoneNumberForEdit";
 
 type BooleanFields =
   | "isEmailForSignInTrue"
@@ -33,7 +40,14 @@ type BooleanFields =
   | "isMonthForSignUpTrue"
   | "isYearForSignUpTrue"
   | "isConfirmPasswordForSignUpTrue"
-  | "isCodeForSignUpTrue";
+  | "isCodeForSignUpTrue"
+  | "isFirstNameForEditTrue"
+  | "isLastNameForEditTrue"
+  | "isAgeForEditTrue"
+  | "isYearForEditTrue"
+  | "isMonthForEditTrue"
+  | "isDayForEditTrue"
+  | "isPhoneNumberForEditTrue";
 
 interface FieldsState {
   enterEmailInHeader: string;
@@ -71,9 +85,26 @@ interface FieldsState {
   isYearForSignUpTrue: boolean;
   codeForSignUp: string;
   isCodeForSignUpTrue: boolean;
+
+  // Edit modal
+  firstNameForEdit: string;
+  isFirstNameForEditTrue: boolean;
+  lastNameForEdit: string;
+  isLastNameForEditTrue: boolean;
+  ageForEdit: string;
+  isAgeForEditTrue: boolean;
+  yearForEdit: string;
+  isYearForEditTrue: boolean;
+  monthForEdit: string;
+  isMonthForEditTrue: boolean;
+  dayForEdit: string;
+  isDayForEditTrue: boolean;
+  phoneNumberForEdit: string;
+  isPhoneNumberForEditTrue: boolean;
 }
 
 const initialState: FieldsState = {
+  // String
   enterEmailInHeader: "",
   enterEmailInFooter: "",
   emailForSignIn: "",
@@ -91,6 +122,15 @@ const initialState: FieldsState = {
   monthForSignUp: "",
   yearForSignUp: "",
   codeForSignUp: "",
+  firstNameForEdit: "",
+  lastNameForEdit: "",
+  ageForEdit: "",
+  yearForEdit: "",
+  monthForEdit: "",
+  dayForEdit: "",
+  phoneNumberForEdit: "",
+
+  // Boolean
   isEmailForSignInTrue: false,
   isPasswordForSignInTrue: false,
   isConfirmPasswordForSignUpTrue: false,
@@ -105,6 +145,13 @@ const initialState: FieldsState = {
   isMonthForSignUpTrue: false,
   isYearForSignUpTrue: false,
   isCodeForSignUpTrue: false,
+  isFirstNameForEditTrue: false,
+  isLastNameForEditTrue: false,
+  isAgeForEditTrue: false,
+  isYearForEditTrue: false,
+  isMonthForEditTrue: false,
+  isDayForEditTrue: false,
+  isPhoneNumberForEditTrue: false,
 };
 
 const Slice = createSlice({

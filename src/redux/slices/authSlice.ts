@@ -20,9 +20,24 @@ interface User {
   gender?: string;
 }
 
+interface UserForEdit {
+  firstname: string;
+  lastname: string;
+  age: number;
+  phoneNumber?: string;
+  dateOfBirth: string;
+  gender?: string;
+}
+
 interface AuthState {
   user: User | null;
   status: "idle" | "succeeded" | "failed" | "loading" | "fieldsError";
+  updateUserStatusForEditModal:
+    | "idle"
+    | "succeeded"
+    | "failed"
+    | "loading"
+    | "fieldsError";
   error: null | string;
   check: boolean;
 }
@@ -151,9 +166,35 @@ export const GetUser = createAsyncThunk<User, string, { rejectValue: string }>(
   }
 );
 
+export const UpdateUser = createAsyncThunk<
+  User,
+  {
+    uid: string;
+    data: UserForEdit;
+  },
+  { rejectValue: string }
+>("Auth/UpdateUser", async ({ uid, data }, thunkAPI) => {
+  try {
+    const res = await fetch(`${FIREBASE_URL}/users/${uid}.json`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const user = await res.json();
+
+    return user;
+  } catch {
+    return thunkAPI.rejectWithValue("Server error. Please try again.");
+  }
+});
+
 const initialState: AuthState = {
   user: null,
   status: "idle",
+  updateUserStatusForEditModal: "idle",
   error: null,
   check: false,
 };
@@ -165,15 +206,21 @@ const Slice = createSlice({
     SetFieldsError: (state) => {
       state.status = "fieldsError";
     },
+    setFieldErrorForUpdateUser: (state) => {
+      state.updateUserStatusForEditModal = "fieldsError";
+    },
     ClearServerFields: (state) => {
       state.error = null;
       state.status = "idle";
+      state.updateUserStatusForEditModal = "idle";
       state.check = false;
       state.user = null;
     },
     LogoutUser: (state) => {
       localStorage.removeItem("uid");
       localStorage.removeItem("LoginInMultiPageReactWebsite");
+      sessionStorage.removeItem("uid");
+      sessionStorage.removeItem("SessionLoginInMultiPageReactWebsite");
       state.error = null;
       state.status = "idle";
       state.check = false;
@@ -239,9 +286,28 @@ const Slice = createSlice({
         state.error = action.payload ?? "Error :(";
         state.status = "failed";
         state.check = false;
+      })
+
+      .addCase(UpdateUser.pending, (state) => {
+        state.error = null;
+        state.updateUserStatusForEditModal = "loading";
+      })
+      .addCase(UpdateUser.fulfilled, (state, action: PayloadAction<User>) => {
+        state.error = null;
+        state.updateUserStatusForEditModal = "succeeded";
+        state.user = action.payload;
+      })
+      .addCase(UpdateUser.rejected, (state, action) => {
+        state.error = action.payload ?? "Error :(";
+        state.updateUserStatusForEditModal = "failed";
       });
   },
 });
 
-export const { SetFieldsError, ClearServerFields, LogoutUser } = Slice.actions;
+export const {
+  SetFieldsError,
+  setFieldErrorForUpdateUser,
+  ClearServerFields,
+  LogoutUser,
+} = Slice.actions;
 export default Slice.reducer;

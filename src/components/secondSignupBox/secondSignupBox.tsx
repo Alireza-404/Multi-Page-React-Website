@@ -46,7 +46,7 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
   const [monthValue, setMonthValue] = useState<string | null>(null);
 
   const [maleChackBox, setMaleCheckBox] = useState<boolean>(false);
-  const [FemaleChackBox, setFemaleCheckBox] = useState<boolean>(false);
+  const [femaleChackBox, setFemaleCheckBox] = useState<boolean>(false);
   const [notSayedGender, setNotSayedGender] = useState<boolean>(false);
 
   const [firstCode, setFirstCode] = useState<number>(0);
@@ -65,11 +65,11 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
       field.isYearForSignUpTrue &&
       field.isMonthForSignUpTrue &&
       field.isDayForSignUpTrue &&
-      (maleChackBox || FemaleChackBox || notSayedGender) &&
+      (maleChackBox || femaleChackBox || notSayedGender) &&
       field.codeForSignUp &&
       monthValue
     ) {
-      const user: User = {
+      const userData: User = {
         uid: crypto.randomUUID(),
         username: field.userNameForSignUp,
         firstname: field.firstNameForSignUp,
@@ -83,19 +83,19 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
       };
 
       if (field.isPhoneNumberForSignUpTrue) {
-        user.phoneNumber = field.phoneNumberForSignUp;
+        userData.phoneNumber = field.phoneNumberForSignUp;
       }
 
       if (maleChackBox) {
-        user.gender = "Male";
-      } else if (FemaleChackBox) {
-        user.gender = "Female";
+        userData.gender = "Male";
+      } else if (femaleChackBox) {
+        userData.gender = "Female";
       } else {
-        user.gender = "NotSayedGender";
+        userData.gender = "NotSayedGender";
       }
 
       try {
-        await dispatch(SignupUser(user)).unwrap();
+        await dispatch(SignupUser(userData)).unwrap();
 
         setTimeout(() => {
           navigate("/sign-in");
@@ -605,7 +605,7 @@ const SecondSignupBox = ({ setShowSecondBoxSignup }: Props) => {
               <div
                 className={`rounded border-2 border-gray-300/50 dark:border-gray-600/40
                   h-5 w-5 ${
-                    FemaleChackBox
+                    femaleChackBox
                       ? "bg-gradient-to-t from-[#d248ee] to-[#ad2eb1]"
                       : "bg-gray-300/15 dark:bg-[#0b0e14]"
                   }`}

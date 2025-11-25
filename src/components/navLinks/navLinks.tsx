@@ -38,7 +38,7 @@ const NavLinks = ({ href, children, setShowNavLinks }: Props) => {
           <button
             type="button"
             className="text-slate-500 dark:text-gray-500 font-medium text-sm lg:text-base cursor-pointer
-              xl:px-3 hidden md2:inline"
+              xl:px-3 px-2 hidden md2:inline"
           >
             <li>{children}</li>
           </button>

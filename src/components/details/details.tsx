@@ -202,7 +202,7 @@ const Details = () => {
                     <Tooltip
                       content={DetailChartCustomTooltip}
                       wrapperStyle={{
-                        zIndex: 9999,
+                        zIndex: 8888,
                       }}
                     />
 

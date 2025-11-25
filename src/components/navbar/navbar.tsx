@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../redux/store";
 import { LogoutUser } from "../../redux/slices/authSlice";
 import { FiSettings } from "react-icons/fi";
+import EditModal from "../editModal/editModal";
 
 const Navbar = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -16,8 +17,11 @@ const Navbar = () => {
   const root = window.document.documentElement;
 
   const [showNavLinks, setShowNavLinks] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showLoader, setShowLoader] = useState<boolean>(false);
   const [uid, setUid] = useState<null | string>(null);
   const [isUserLogged, setIsUserLogged] = useState<boolean>(false);
+  const [showEditModalTimer, setShowEditModalTimer] = useState<boolean>(false);
 
   useEffect(() => {
     // Local Storage
@@ -62,6 +66,18 @@ const Navbar = () => {
       root.classList.remove("overflow-hidden");
     }
   }, [showNavLinks]);
+
+  useEffect(() => {
+    if (!showEditModal) {
+      const timer: NodeJS.Timeout = setTimeout(() => {
+        setShowEditModalTimer(false);
+      }, 300);
+
+      return () => clearTimeout(timer);
+    } else {
+      setShowEditModalTimer(true);
+    }
+  }, [showEditModal]);
 
   const setThemeHandler = (theme: string) => {
     localStorage.setItem("SiteMarkTheme", theme);
@@ -275,6 +291,10 @@ const Navbar = () => {
                     className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
                       h-9 w-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
                       flex items-center justify-center gap-x-2"
+                    onClick={() => {
+                      setShowEditModal(true);
+                      setShowNavLinks(false);
+                    }}
                   >
                     Edit
                     <FiSettings className="text-gray-500 dark:text-gray-400 text-sm" />
@@ -286,8 +306,6 @@ const Navbar = () => {
                       transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-white/75
                       flex items-center justify-center"
                     onClick={() => {
-                      localStorage.removeItem("uid");
-                      localStorage.removeItem("LoginInMultiPageReactWebsite");
                       dispatch(LogoutUser());
                       setUid(null);
                       setIsUserLogged(false);
@@ -302,8 +320,27 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {showNavLinks && (
-        <Overlay className="fixed" click={() => setShowNavLinks(false)} />
+      {showEditModalTimer && (
+        <EditModal
+          key={"showEditModal"}
+          showEditModal={showEditModal}
+          setShowEditModal={setShowEditModal}
+          showLoader={showLoader}
+          setShowLoader={setShowLoader}
+        />
+      )}
+
+      {(showNavLinks || showEditModal) && (
+        <Overlay
+          className="fixed"
+          click={() => {
+            if (showNavLinks) setShowNavLinks(false);
+            if (showEditModal) {
+              setShowEditModal(false);
+              setShowLoader(false);
+            }
+          }}
+        />
       )}
 
       <nav
@@ -432,6 +469,7 @@ const Navbar = () => {
                 className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
                   w-20 h-10 hover:bg-gray-300/65 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
                   flex items-center justify-center gap-x-2"
+                onClick={() => setShowEditModal(true)}
               >
                 Edit
                 <FiSettings className="text-gray-500 dark:text-gray-400 text-sm" />
@@ -443,12 +481,6 @@ const Navbar = () => {
                   transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-gray-300/95
                   flex items-center justify-center"
                 onClick={() => {
-                  localStorage.removeItem("uid");
-                  localStorage.removeItem("LoginInMultiPageReactWebsite");
-                  sessionStorage.removeItem("uid");
-                  sessionStorage.removeItem(
-                    "SessionLoginInMultiPageReactWebsite"
-                  );
                   dispatch(LogoutUser());
                   setUid(null);
                   setIsUserLogged(false);

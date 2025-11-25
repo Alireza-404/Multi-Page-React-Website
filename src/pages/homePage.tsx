@@ -83,7 +83,7 @@ const HomePage = () => {
         animate={{
           backgroundColor: ["#027af2", "#021aef", "#6502ef", "#027af2"],
         }}
-        transition={{ duration: 7, repeat: Infinity, ease: "linear" }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
         className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full fixed bottom-7 right-7 z-[9999]
            transition-all duration-300
           border-2 border-gray-500 dark:border-gray-400 outline outline-2 outline-gray-400 dark:outline-gray-300
@@ -123,7 +123,8 @@ const HomePage = () => {
         <motion.p
           animate={{ backgroundPosition: ["0% 200%", "200% 0%"] }}
           transition={{ duration: 2, ease: "linear", repeat: Infinity }}
-          className="bg-gradient-to-r from-gray-300 via-white to-gray-400
+          className="bg-gradient-to-r dark:from-gray-300 dark:via-white dark:to-gray-400
+            from-gray-600 via-gray-700 to-gray-400
            bg-clip-text text-transparent text-center text-sm mt-3 xs:mt-6 mx-auto
           xs:w-96 xs:text-base md:text-lg md:w-[450px] lg:w-[700px]"
           data-aos="fade-up"

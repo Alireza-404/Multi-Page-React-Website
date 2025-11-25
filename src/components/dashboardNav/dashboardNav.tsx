@@ -16,6 +16,9 @@ import { LuLogOut, LuSparkles } from "react-icons/lu";
 import { MdDashboard, MdFeedback } from "react-icons/md";
 import { Link } from "react-router-dom";
 import Overlay from "../overlay/overlay";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../redux/store";
+import { LogoutUser } from "../../redux/slices/authSlice";
 
 interface LinksArrayType {
   id: number;
@@ -26,9 +29,16 @@ interface LinksArrayType {
 
 const DashboardNav = ({
   setStringActiveLink,
+  firstname,
+  lastname,
+  email,
 }: {
   setStringActiveLink: React.Dispatch<string>;
+  firstname: string;
+  lastname: string;
+  email: string;
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
   const root = window.document.documentElement;
 
   // Mobile Nav
@@ -112,7 +122,7 @@ const DashboardNav = ({
             exit={{ x: "-100%" }}
             transition={{ duration: 0.3 }}
             className="py-5 bg-gray-200 dark:bg-[#0c1017] z-50 top-0 left-0 h-full overflow-y-auto w-72
-            flex flex-col justify-between fixed"
+            flex flex-col justify-between fixed gap-y-10"
           >
             <div className="flex flex-col gap-y-4">
               <div className="flex items-center justify-between px-4">
@@ -125,8 +135,10 @@ const DashboardNav = ({
                     <FaUser className="text-gray-600 dark:text-gray-500 text-xs" />
                   </div>
 
-                  <span className="text-slate-800 dark:text-gray-200 font-medium text-lg">
-                    Alireza Shabani
+                  <span className="text-slate-800 dark:text-gray-200 font-medium text-lg text-wrap">
+                    {firstname && lastname
+                      ? `${firstname}.${lastname.toUpperCase().slice(0, 2)}`
+                      : "Alireza.SH"}
                   </span>
                 </div>
 
@@ -163,13 +175,13 @@ const DashboardNav = ({
                     type="button"
                     key={link.id}
                     className={` text-sm flex items-center gap-x-2 font-medium cursor-pointer px-4 py-2
-                  rounded-md transition-all select-none w-full
-                  duration-200 ${
-                    link.isActive && link.id === activeLink
-                      ? `bg-gray-300 dark:bg-[#323947] hover:bg-gray-300 dark:hover:bg-[#323947]
+                    rounded-md transition-all select-none w-full
+                    duration-200 ${
+                      link.isActive && link.id === activeLink
+                        ? `bg-gray-300 dark:bg-[#323947] hover:bg-gray-300 dark:hover:bg-[#323947]
                         text-slate-800 dark:text-gray-200`
-                      : "bg-transparent hover:bg-gray-300/40 dark:hover:bg-[#232b3986]"
-                  }`}
+                        : "bg-transparent hover:bg-gray-300/40 dark:hover:bg-[#232b3986]"
+                    }`}
                     onClick={() => {
                       setActiveLink(link.id);
                       setStringActiveLink(link.text);
@@ -271,23 +283,52 @@ const DashboardNav = ({
                   <button
                     type="button"
                     className="text-gray-100 bg-slate-800  hover:bg-slate-700 rounded-md font-semibold transition
-                duration-200 dark:text-[#05070a] dark:bg-gray-200 dark:hover:bg-white/75 text-sm py-1.5"
+                    duration-200 dark:text-[#05070a] dark:bg-gray-200 dark:hover:bg-white/75 text-sm py-1.5"
                   >
                     Get the discount
                   </button>
                 </div>
               </div>
 
-              <div className="px-4">
-                <button
-                  type="button"
-                  className="border-2 border-gray-300/50 dark:border-gray-600/40 rounded-md py-1.5 flex items-center
-                  justify-center gap-x-2 bg-gray-100 dark:bg-[#05070a61] text-slate-800 dark:text-gray-200 w-full
+              <div className="px-4 flex flex-col gap-y-2.5">
+                {firstname && lastname && email ? (
+                  <button
+                    type="button"
+                    className="border-2 border-gray-300/50 dark:border-gray-600/40 rounded-md py-1.5 flex items-center
+                    justify-center gap-x-2 bg-gray-100 dark:bg-[#05070a61] text-slate-800 dark:text-gray-200 w-full
                   hover:border-gray-400/50 dark:hover:border-gray-500/40 transition-all duration-200"
-                >
-                  <LuLogOut />
-                  Logout
-                </button>
+                    onClick={() => {
+                      dispatch(LogoutUser());
+                    }}
+                  >
+                    <LuLogOut />
+                    Logout
+                  </button>
+                ) : (
+                  <>
+                    <Link to={"/sign-in"}>
+                      <button
+                        type="button"
+                        className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50 dark:border-gray-600/40
+                        h-9 w-full hover:bg-gray-200 dark:hover:bg-slate-700 transition-all duration-200 dark:text-gray-200
+                        flex items-center justify-center"
+                      >
+                        Sign in
+                      </button>
+                    </Link>
+
+                    <Link to={"/sign-up"}>
+                      <button
+                        type="button"
+                        className="text-sm lg:text-base rounded-md bg-slate-800 h-9 w-full text-gray-200 font-medium hover:bg-slate-700
+                        transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-white/75
+                        flex items-center justify-center"
+                      >
+                        Sign up
+                      </button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
@@ -302,7 +343,10 @@ const DashboardNav = ({
         className="hidden bg-gray-200 dark:bg-[#0c1017] px-6
           md2:flex border-r border-gray-300/50 dark:border-gray-600/40"
       >
-        <div className="w-60 h-full fixed top-0 left-0 bottom-0 z-50 py-7 flex flex-col justify-between">
+        <div
+          className="w-60 h-full overflow-y-auto fixed top-0 left-0 bottom-0 z-50 py-7 flex flex-col justify-between
+          gap-y-10 scrollbar-hide"
+        >
           <div className="flex flex-col gap-y-5 px-2.5">
             <h1 className="text-xl text-slate-800 dark:text-gray-200 font-bold">
               Dashboard
@@ -433,18 +477,20 @@ const DashboardNav = ({
               <div
                 className="w-9 h-9 rounded-full bg-gray-100 dark:bg-[#05070a61] flex items-center justify-center
                 border-[0.5px] border-gray-300/50 dark:border-gray-600/40 outline outline-[0.5px] outline-[#037BF2]
-                outline-offset-2"
+                outline-offset-2 flex-shrink-0"
               >
                 <FaUser className="text-gray-600 dark:text-gray-500 text-xl" />
               </div>
 
               <div className="flex items-center gap-x-2.5">
                 <div className="flex flex-col">
-                  <span className="text-slate-800 dark:text-gray-200 font-medium text-sm">
-                    Alireza Shabani
+                  <span className="text-slate-800 dark:text-gray-200 font-medium text-sm text-wrap">
+                    {firstname && lastname
+                      ? `${firstname} ${lastname}`
+                      : "Alireza Shabani"}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    alireza404@gmail.com
+                  <span className="text-xs text-gray-500 dark:text-gray-400 break-all">
+                    {email ? email : "alireza404@gmail.com"}
                   </span>
                 </div>
 
@@ -466,59 +512,116 @@ const DashboardNav = ({
                         initial={{ opacity: 0.2, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.7 }}
-                        transition={{ duration: 0.1 }}
+                        transition={{ duration: 0.2 }}
                         ref={dropdownRef}
                         className="bg-gray-100 dark:bg-[#05070a] py-3 px-2 rounded-md border border-gray-300/50
                       dark:border-gray-600/40 flex flex-col gap-y-1.5 absolute right-0 bottom-0"
                       >
-                        <li
-                          className="py-1 px-2 text-slate-800 dark:text-gray-200
+                        {firstname && lastname && email ? (
+                          <>
+                            <li
+                              className="py-1 px-2 text-slate-800 dark:text-gray-200
                         hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
                           text-nowrap"
-                        >
-                          Profile
-                        </li>
+                            >
+                              Profile
+                            </li>
 
-                        <li
-                          className="py-1 px-2 text-slate-800 dark:text-gray-200
-                    hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
-                    text-nowrap"
-                        >
-                          My account
-                        </li>
+                            <li
+                              className="py-1 px-2 text-slate-800 dark:text-gray-200
+                        hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
+                          text-nowrap"
+                            >
+                              My account
+                            </li>
 
-                        <div className="py-2">
-                          <span className="h-px block w-full bg-gray-300/50 dark:bg-gray-600/40"></span>
-                        </div>
+                            <div className="py-2">
+                              <span className="h-px block w-full bg-gray-300/50 dark:bg-gray-600/40"></span>
+                            </div>
 
-                        <li
-                          className="py-1 px-2 text-slate-800 dark:text-gray-200
-                    hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
-                    text-nowrap"
-                        >
-                          Add another account
-                        </li>
+                            <li
+                              className="py-1 px-2 text-slate-800 dark:text-gray-200
+                        hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
+                          text-nowrap"
+                            >
+                              Add another account
+                            </li>
 
-                        <li
-                          className="py-1 px-2 text-slate-800 dark:text-gray-200
-                    hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
-                    text-nowrap"
-                        >
-                          Settings
-                        </li>
+                            <li
+                              className="py-1 px-2 text-slate-800 dark:text-gray-200
+                        hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
+                          text-nowrap"
+                            >
+                              Settings
+                            </li>
 
-                        <div className="py-2">
-                          <span className="h-px block w-full bg-gray-300/50 dark:bg-gray-600/40"></span>
-                        </div>
+                            <div className="py-2">
+                              <span className="h-px block w-full bg-gray-300/50 dark:bg-gray-600/40"></span>
+                            </div>
 
-                        <li
-                          className="py-1 px-2 text-slate-800 dark:text-gray-200
-                    hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
-                    text-nowrap flex items-center justify-between"
-                        >
-                          Logout{" "}
-                          <LuLogOut className="text-red-600 dark:text-red-500" />
-                        </li>
+                            <li
+                              className="py-1 px-2 text-slate-800 dark:text-gray-200
+                            hover:bg-gray-200 dark:hover:bg-[#0b0e14] transition-all duration-200 cursor-pointer rounded-md
+                              text-nowrap flex items-center justify-between"
+                              onClick={() => {
+                                dispatch(LogoutUser());
+                              }}
+                            >
+                              Logout{" "}
+                              <LuLogOut className="text-red-600 dark:text-red-500" />
+                            </li>
+                          </>
+                        ) : (
+                          <>
+                            <li
+                              className="py-1 px-2 text-slate-800 dark:text-gray-200
+                              transition-all duration-200 rounded-md w-40 text-center"
+                            >
+                              You{" "}
+                              <span className="text-red-600 dark:text-red-500">
+                                don’t have
+                              </span>{" "}
+                              an account yet. Please sign{" "}
+                              <span className="text-[#027af2]">
+                                in or create
+                              </span>{" "}
+                              one{" "}
+                              <span className="text-[#027af2]">
+                                to continue
+                              </span>
+                              .
+                            </li>
+
+                            <div className="py-2">
+                              <span className="h-px block w-full bg-gray-300/50 dark:bg-gray-600/40"></span>
+                            </div>
+
+                            <li>
+                              <Link
+                                to={"/sign-in"}
+                                type="button"
+                                className="text-sm lg:text-base rounded-md cursor-pointer border-2 border-gray-300/50
+                               dark:border-gray-600/40 flex items-center justify-center dark:text-gray-200
+                              h-8 hover:bg-gray-300/65 dark:hover:bg-slate-700 transition-all duration-200"
+                              >
+                                Sign in
+                              </Link>
+                            </li>
+
+                            <li>
+                              <Link
+                                to={"/sign-up"}
+                                type="button"
+                                className="text-sm lg:text-base rounded-md bg-slate-800 h-8 text-gray-200
+                               font-medium hover:bg-slate-700 dark:hover:bg-gray-300/95
+                              transition-all duration-200 cursor-pointer dark:bg-gray-200 
+                              dark:text-slate-800 flex items-center justify-center"
+                              >
+                                Sign up
+                              </Link>
+                            </li>
+                          </>
+                        )}
                       </motion.ul>
                     )}
                   </AnimatePresence>

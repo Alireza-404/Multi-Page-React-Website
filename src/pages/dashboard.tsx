@@ -1,3 +1,4 @@
+import { useDispatch, useSelector } from "react-redux";
 import {
   Area,
   AreaChart,
@@ -14,7 +15,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import DashboardNav from "../components/dashboardNav/dashboardNav";
 import {
   FirstAreaChartData,
   FirstBarChartData,
@@ -32,6 +32,10 @@ import {
   CircleChartCustomTooltip,
   LineChartCustomTooltip,
 } from "../components/customTooltips/customTooltips";
+import type { AppDispatch, RootState } from "../redux/store";
+import { motion } from "framer-motion";
+import { GetUser } from "../redux/slices/authSlice";
+import DashboardNav from "../components/dashboardNav/dashboardNav";
 import Details from "../components/details/details";
 import ProductsTree from "../components/productsTree/productsTree";
 
@@ -44,6 +48,12 @@ interface ChartBarInterface {
 }
 
 const Dashboard = () => {
+  const { user, status, error } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+  const [uid, setUid] = useState<string | null | undefined>(null);
+  const [isUserLogged, setIsUserLogged] = useState<boolean>(false);
+  const [showLoader, setShowLoader] = useState<boolean>(false);
+
   const [theme, setTheme] = useState<"Dark" | "Light">("Light");
   const [finallyBarChartData, setFinallyBarChartData] = useState<
     ChartBarInterface[]
@@ -68,6 +78,8 @@ const Dashboard = () => {
   }, [theme]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+
     const chartData = FirstBarChartData.map((item) => ({
       ...item,
       total: item.pageViews + item.downloads + item.conversions,
@@ -109,6 +121,86 @@ const Dashboard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Get User
+  useEffect(() => {
+    const getUid = localStorage.getItem("uid");
+    const getUidFromSession = sessionStorage.getItem("uid");
+
+    const getIsUserLogged = localStorage.getItem(
+      "LoginInMultiPageReactWebsite"
+    );
+    const getIsUserLoggedFromSession = sessionStorage.getItem(
+      "SessionLoginInMultiPageReactWebsite"
+    );
+
+    if (getUid && getIsUserLogged && JSON.parse(getIsUserLogged)) {
+      setUid(getUid);
+      setIsUserLogged(JSON.parse(getIsUserLogged));
+      dispatch(GetUser(getUid));
+    } else if (
+      getUidFromSession &&
+      getIsUserLoggedFromSession &&
+      JSON.parse(getIsUserLoggedFromSession)
+    ) {
+      setUid(getUidFromSession);
+      setIsUserLogged(JSON.parse(getIsUserLoggedFromSession));
+      dispatch(GetUser(getUidFromSession));
+    } else {
+      setUid(null);
+      setIsUserLogged(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (status === "loading") {
+      setShowLoader(true);
+    } else {
+      const timer: NodeJS.Timeout = setTimeout(() => {
+        setShowLoader(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
+
+  if (showLoader && uid && isUserLogged)
+    return (
+      <div className="bg-gray-200 dark:bg-[#0c1017] flex items-center justify-center fixed z-[9999] inset-0">
+        <motion.p
+          animate={{ backgroundPosition: ["0% 200%", "200% 0%"] }}
+          transition={{ duration: 2, ease: "linear", repeat: Infinity }}
+          className="md:text-7xl text-5xl text-transparent bg-clip-text bg-gradient-to-r from-[#0272f2] via-[#4beea7]
+          to-[#0272f2] font-bold font-mono h-20 flex items-center select-none"
+          style={{ backgroundSize: "200% 200%" }}
+        >
+          Loading
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-[#27f2ff] via-[#4beea7] to-[#0272f2]"
+              style={{
+                WebkitBackgroundClip: "text",
+                filter:
+                  "drop-shadow(0 0 6px rgba(75,238,167,0.8)) drop-shadow(0 0 4px rgba(2,114,242,0.8))",
+              }}
+              key={i}
+              animate={{
+                y: [-25, 0, 0, 25],
+                opacity: [0, 1, 1, 0],
+                scale: [0.8, 1, 1, 0.8],
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.4 * 4,
+                repeat: Infinity,
+                delay: i * 0.2,
+              }}
+            >
+              .
+            </motion.span>
+          ))}
+        </motion.p>
+      </div>
+    );
+
   const calculateOffsets = (item: ChartBarInterface) => {
     const { pageViews, downloads, total } = item;
     const pagePercent = pageViews / total;
@@ -130,13 +222,18 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-[#05070a] overflow-x-hidden md2:grid md2:grid-cols-[240px_1fr]">
-      <DashboardNav setStringActiveLink={setStringActiveLink} />
+      <DashboardNav
+        setStringActiveLink={setStringActiveLink}
+        firstname={user?.firstname as string}
+        lastname={user?.lastname as string}
+        email={user?.email as string}
+      />
 
       <div className="min-w-full">
         <main className="pt-20 md2:pt-7">
           <div
             className="hidden md2:flex mb-5 w-11/12 xl:w-full
-         xl:px-10 mx-auto"
+            xl:px-10 mx-auto"
           >
             <div className="flex items-center gap-x-2.5">
               <span className="font-medium text-gray-500 dark:text-gray-400 cursor-pointer">
@@ -149,8 +246,6 @@ const Dashboard = () => {
                 {stringActiveLink}
               </span>
             </div>
-
-            <div></div>
           </div>
 
           <p
@@ -220,6 +315,7 @@ const Dashboard = () => {
                     type={"linear"}
                     dataKey={"activity"}
                     stroke="#16a34a"
+                    animationEasing="linear"
                     strokeWidth={2}
                     dot={{ display: "none" }}
                     activeDot={{ r: 5, fill: "#16a34a", stroke: "none" }}
@@ -285,6 +381,7 @@ const Dashboard = () => {
                     type={"linear"}
                     dataKey={"activity"}
                     stroke="#dc2626"
+                    animationEasing="linear"
                     strokeWidth={2}
                     dot={{ display: "none" }}
                     activeDot={{ r: 5, fill: "#dc2626", stroke: "none" }}
@@ -351,6 +448,7 @@ const Dashboard = () => {
                       type={"linear"}
                       dataKey={"activity"}
                       stroke="#9ca3af"
+                      animationEasing="linear"
                       strokeWidth={2}
                       dot={{ display: "none" }}
                       activeDot={{ r: 5, fill: "#9ca3af", stroke: "none" }}
@@ -522,6 +620,7 @@ const Dashboard = () => {
                     fillOpacity={1}
                     fill="url(#direct)"
                     activeDot={{ fill: "#0059b3ff", stroke: "none", r: 5.5 }}
+                    isAnimationActive={false}
                   />
 
                   <Area
@@ -532,6 +631,7 @@ const Dashboard = () => {
                     fillOpacity={1}
                     fill="url(#referral)"
                     activeDot={{ fill: "#027af2ff", stroke: "none", r: 5.5 }}
+                    isAnimationActive={false}
                   />
 
                   <Area
@@ -542,6 +642,7 @@ const Dashboard = () => {
                     fillOpacity={1}
                     fill="url(#organic)"
                     activeDot={{ fill: "#5199e3", stroke: "none", r: 5.5 }}
+                    isAnimationActive={false}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -677,6 +778,7 @@ const Dashboard = () => {
                     dataKey="total"
                     barSize={barSize}
                     radius={[12, 12, 0, 0]}
+                    isAnimationActive={false}
                   >
                     {finallyBarChartData.map((item) => {
                       return (
@@ -735,12 +837,11 @@ const Dashboard = () => {
                           dataKey="value"
                           onMouseEnter={(_, index) => setActiveIndex(index)}
                           onMouseLeave={() => setActiveIndex(null)}
-                          isAnimationActive={false}
                         >
                           <Tooltip
                             content={<CircleChartCustomTooltip />}
                             wrapperStyle={{
-                              zIndex: 9999,
+                              zIndex: 8888,
                               outline: "none",
                               border: "none",
                             }}

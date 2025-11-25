@@ -69,6 +69,8 @@ const SignIn = () => {
       navigate("/");
     }
 
+    scrollTo(0, 0);
+
     AOS.init({ duration: 1000, once: true });
     AOS.refresh();
   }, []);
@@ -237,8 +239,8 @@ const SignIn = () => {
 
                   <p
                     className="text-sm text-slate-800 dark:text-gray-200 font-medium relative after:absolute
-                  after:w-full after:-bottom-0.5 after:bg-gray-400/70 dark:after:bg-slate-600 hover:after:w-0
-                  after:transition-all after:duration-200 after:left-0 after:h-px inline cursor-pointer"
+                      after:w-full after:-bottom-0.5 after:bg-gray-400/70 dark:after:bg-slate-600 hover:after:w-0
+                      after:transition-all after:duration-200 after:left-0 after:h-px inline cursor-pointer"
                   >
                     Forgot your password?
                   </p>
@@ -347,7 +349,7 @@ const SignIn = () => {
                 disabled={status === "succeeded" || status === "loading"}
               >
                 {status === "loading"
-                  ? "Signing In"
+                  ? "Signing in"
                   : status === "failed"
                   ? "Try again"
                   : status === "succeeded"
