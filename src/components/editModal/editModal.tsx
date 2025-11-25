@@ -293,8 +293,9 @@ const EditModal = ({
             <motion.p
               animate={{ backgroundPosition: ["0% 200%", "200% 0%"] }}
               transition={{ duration: 1.5, ease: "linear", repeat: Infinity }}
-              className="md:text-5xl py-2 text-[44px] text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400
-              to-white font-bold font-mono flex items-center select-none px-2 text-center relative z-20"
+              className="md:text-5xl py-2 text-[44px] text-transparent bg-clip-text bg-gradient-to-r
+              dark:from-white dark:via-gray-400 from-slate-800 via-slate-500/80 to-slate-800
+              dark:to-white font-bold font-mono flex items-center select-none px-2 text-center relative z-20"
               style={{ backgroundSize: "200% 200%" }}
             >
               {error}

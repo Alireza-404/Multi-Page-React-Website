@@ -201,6 +201,34 @@ const Dashboard = () => {
       </div>
     );
 
+  if (error && uid && isUserLogged)
+    return (
+      <div
+        className="bg-gray-200 dark:bg-[#0c1017] flex flex-col items-center justify-center gap-y-5 md:gap-y-10
+      fixed z-[9999] inset-0"
+      >
+        <motion.p
+          animate={{ backgroundPosition: ["0% 200%", "200% 0%"] }}
+          transition={{ duration: 2, ease: "linear", repeat: Infinity }}
+          className="md:text-6xl lg:text-7xl text-4xl text-transparent bg-clip-text bg-gradient-to-r from-[#f20202] via-[#ee4b4b]
+          to-[#f20202] font-bold font-mono flex items-center select-none text-center py-2"
+          style={{ backgroundSize: "200% 200%" }}
+        >
+          {error}
+        </motion.p>
+
+        <button
+          type="button"
+          className="text-sm md:text-base rounded-md bg-slate-800 w-24 h-12 text-gray-200 
+          font-bold hover:bg-slate-700 flex items-center justify-center md:w-28 lg:w-32 lg:h-14 lg:text-[17px]
+          transition-all duration-200 cursor-pointer dark:bg-gray-200 dark:text-slate-800 dark:hover:bg-gray-300/95"
+          onClick={() => dispatch(GetUser(uid))}
+        >
+          Try again
+        </button>
+      </div>
+    );
+
   const calculateOffsets = (item: ChartBarInterface) => {
     const { pageViews, downloads, total } = item;
     const pagePercent = pageViews / total;
