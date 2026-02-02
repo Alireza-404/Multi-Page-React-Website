@@ -97,6 +97,15 @@ Now open your browser at **http://localhost:5173** (or the port shown in the con
 
 ---
 
+## 🚀 Deployment
+
+This project is deployed on **Vercel** for instant preview and live testing.
+You can access the live website here: [Signal-Guard-Website Live](https://multi-page-react-website-z404z.vercel.app)
+
+Vercel handles **automatic builds** from the GitHub repository, so every push to the `main` branch updates the live site instantly.
+
+---
+
 ## 🧩 How It Works
 
 - Redux Toolkit manages global state across pages efficiently.
